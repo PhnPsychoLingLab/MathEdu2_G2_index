@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小二數學教育實驗網頁索引</title>
+    
+    <!-- 防止瀏覽器緩存 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <style>
         * {
             margin: 0;
@@ -204,7 +209,7 @@
                 2️⃣
             </a>
             <a href="https://run.pavlovia.org/IPWan/g2-exp3-1210" class="demo-button button-three" target="_blank">
-                3️⃣
+                3️⃣🚫
             </a>
         </div>
         
@@ -214,13 +219,49 @@
     </div>
 
     <script>
+        // 為連結添加時間戳記參數，確保每次點擊都獲取最新版本
+        function addTimestampToLinks() {
+            document.querySelectorAll('.demo-button').forEach(button => {
+                const originalHref = button.getAttribute('href');
+                if (originalHref && !originalHref.includes('_t=')) {
+                    const separator = originalHref.includes('?') ? '&' : '?';
+                    button.setAttribute('href', originalHref + separator + '_t=' + Date.now());
+                }
+            });
+        }
+
+        // 頁面載入時添加時間戳記
+        window.addEventListener('DOMContentLoaded', addTimestampToLinks);
+
+        // 當頁面重新顯示時（例如從其他分頁切換回來），重新載入頁面
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // 檢查是否已經超過 5 秒未活動
+                const lastUpdate = localStorage.getItem('lastPageUpdate');
+                const now = Date.now();
+                
+                if (!lastUpdate || (now - lastUpdate) > 5000) {
+                    localStorage.setItem('lastPageUpdate', now);
+                    location.reload(true);
+                }
+            }
+        });
+
+        // 記錄頁面載入時間
+        localStorage.setItem('lastPageUpdate', Date.now());
+
         // 簡單的點擊反饋
         document.querySelectorAll('.demo-button').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function(e) {
                 this.style.transform = 'translateY(0)';
                 setTimeout(() => {
                     this.style.transform = '';
                 }, 100);
+                
+                // 更新連結的時間戳記
+                const originalHref = this.getAttribute('href').split('?')[0].split('&_t=')[0];
+                const separator = originalHref.includes('?') ? '&' : '?';
+                this.setAttribute('href', originalHref + separator + '_t=' + Date.now());
             });
         });
     </script>
